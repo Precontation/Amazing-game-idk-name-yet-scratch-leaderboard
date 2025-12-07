@@ -5,7 +5,7 @@ permissions:
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 1 * *' # Every 1 month
+    - cron: '0 0 * * 0' # Once a week
 
 env:
   UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
