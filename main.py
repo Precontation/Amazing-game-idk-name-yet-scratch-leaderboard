@@ -55,13 +55,13 @@ def add_score(argument1): # sets the score of the user to the second argument, s
     return "score set"
 
 @tw_client.request
-def add_score(argument1): # sets the score of the user to the second argument, saved to a database
+def add_score(argument1, argument2): # sets the score of the user to the second argument, saved to a database
     try:
         score = int(argument1)
     except ValueError:
         return "Error: Score must be a whole number!"
     
-    redis.zadd('leaderboard_tw', {tw_client.get_requester(): score} )
+    redis.zadd('leaderboard_tw', {argument2: score} )
     return "score set"
 
 @client.request
@@ -102,8 +102,8 @@ def reset_score(): # deletes the user's score from the database
     return "RESET"
 
 @tw_client.request
-def reset_score(): # deletes the user's score from the database
-    redis.zrem('leaderboard_tw', tw_client.get_requester())
+def reset_score(argument1): # deletes the user's score from the database
+    redis.zrem('leaderboard_tw', argument1)
     return "RESET"
 
 @client.request
