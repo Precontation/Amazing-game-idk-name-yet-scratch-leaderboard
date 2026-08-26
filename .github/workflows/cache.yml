@@ -18,7 +18,7 @@ jobs:
         filters: |
           requirements:
             - 'requirements.txt'
-    - uses: actions/setup-python@v6
+    - uses: actions/setup-python@v7
       if: github.event_name == 'workflow_dispatch' || steps.filter.outputs.requirements == 'true'
       with:
         python-version: '3.12'
