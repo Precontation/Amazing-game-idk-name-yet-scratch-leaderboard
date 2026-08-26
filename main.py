@@ -28,13 +28,13 @@ def ping(): # sends back 'pong' to the Scratch project
     return "pong"
 
 @client.request
-def add_score(argument1, argument2): # sets the score of the user to the second argument, saved to a database
+def add_score(argument1): # sets the score of the user to the second argument, saved to a database
     try:
-        score = int(argument2)
+        score = int(argument1)
     except ValueError:
-        return "Error: Score must be a number!"
+        return "Error: Score must be a whole number!"
     
-    redis.zadd('leaderboard', {argument1: score} )
+    redis.zadd('leaderboard', {client.get_requester(): score} )
     return "score set"
 
 @client.request
@@ -44,27 +44,31 @@ def get_score(argument1): # retrieve a user's score
     # Check if the player exists in the leaderboard
     if response is not None:
         # If player exists, return the data
-        return int(response)
+        try:
+            return int(response)
+        except ValueError:
+            # This should never happen but who knows
+            return 0
     else:
         # If player doesn't exist, return 0
         return 0
     
 @client.request
-def reset_score(argument1): # deletes the user's score from the database
-    redis.zrem('leaderboard', argument1)
+def reset_score(): # deletes the user's score from the database
+    redis.zrem('leaderboard', client.get_requester())
     return "RESET"
 
 @client.request
-def get_leaderboard(leaderboardStart): # returns a list of the top 10 scores
-    leaderboardStart = int(leaderboardStart)
+def get_leaderboard(leaderboardStart): # returns a list of the top 5 scores
+    try:
+        leaderboardStart = int(leaderboardStart)
+    except ValueError:
+        return "Error: Leaderboard start must be a whole number!"
 
     descending_users = redis.zrange('leaderboard', leaderboardStart, leaderboardStart + 4, withscores=True, rev=True)
     
-    if descending_users is not None:
-        leaderboard_list = [ f"{user[0]}: {int(user[1])}" for user in descending_users ]
-        leaderboard_list.append(str(redis.zcard('leaderboard')))
-        return leaderboard_list
-    else:
-        return []
+    leaderboard_list = [ f"{user[0]}: {int(user[1])}" for user in descending_users ]
+    leaderboard_list.append(str(redis.zcard('leaderboard')))
+    return leaderboard_list
 
 client.start(thread=True)
