@@ -1,3 +1,3 @@
-scratchattach==2.2.1
+scratchattach==2.2.5
 python-dotenv==1.2.2
 upstash-redis==1.7.0
